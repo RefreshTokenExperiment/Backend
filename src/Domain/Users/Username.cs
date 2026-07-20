@@ -8,7 +8,7 @@ public sealed record Username
 
     public const int MaxLength = 16;
 
-    private static readonly IEnumerable<char> AllowedChars = GetAllowedChars();
+    private static readonly HashSet<char> AllowedChars = [..GetAllowedChars()];
     private static IEnumerable<char> GetAllowedChars()
     {
         yield return '$';
