@@ -28,4 +28,7 @@ public sealed record Result<T>
 
     public static implicit operator Result<T>(T value) => Success(value);
     public static implicit operator Result<T>(Error error) => Failure(error);
+
+    public static implicit operator T(Result<T> result) 
+        => result.Value ?? throw new ArgumentNullException($"{nameof(result.Value)} is null, while {nameof(result.IsFailure)} is '{result.IsFailure}'");
 }
