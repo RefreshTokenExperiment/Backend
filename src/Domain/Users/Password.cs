@@ -19,12 +19,14 @@ public sealed record Password
         return validationError is null ? new Password(hasher.Hash(password)) : validationError;
     }
 
+    public static Password FromHash(string passwordHash) => new(passwordHash);
+
     private static Error? Validate(string password)
     {
-        if (password.Length < MinLength) return UserErrors.PasswordTooShort;
-        if (!password.Any(char.IsLower)) return UserErrors.PasswordHasNoLowercase;
-        if (!password.Any(char.IsUpper)) return UserErrors.PasswordHasNoUppercase;
-        if (!password.Any(char.IsDigit)) return UserErrors.PasswordHasNoDigit;
+        if (password.Length < MinLength) return new UserDomainErrors.PasswordTooShort();
+        if (!password.Any(char.IsLower)) return new UserDomainErrors.PasswordHasNoLowercase();
+        if (!password.Any(char.IsUpper)) return new UserDomainErrors.PasswordHasNoUppercase();
+        if (!password.Any(char.IsDigit)) return new UserDomainErrors.PasswordHasNoDigit();
 
         return null;
     }

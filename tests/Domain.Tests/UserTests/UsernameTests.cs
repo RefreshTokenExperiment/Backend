@@ -13,7 +13,7 @@ public class UsernameTests
         var result = Username.Create(username);
 
         Assert.That(result.IsFailure, Is.True);
-        Assert.That(result.Error, Is.EqualTo(UserErrors.UsernameIsTooLong));
+        Assert.That(result.Error, Is.TypeOf<UserDomainErrors.UsernameIsTooLong>());
     }
 
     [TestCase("1SomeUsername")]
@@ -23,7 +23,7 @@ public class UsernameTests
         var result = Username.Create(username);
 
         Assert.That(result.IsFailure, Is.True);
-        Assert.That(result.Error, Is.EqualTo(UserErrors.UsernameStartsWithDigit));
+        Assert.That(result.Error, Is.TypeOf<UserDomainErrors.UsernameStartsWithDigit>());
     }
 
     [TestCase("_SomeUsername")]
@@ -33,7 +33,7 @@ public class UsernameTests
         var result = Username.Create(username);
 
         Assert.That(result.IsFailure, Is.True);
-        Assert.That(result.Error, Is.EqualTo(UserErrors.UsernameStartsWithUnderscore));
+        Assert.That(result.Error, Is.TypeOf<UserDomainErrors.UsernameStartsWithUnderscore>());
     }
 
     [TestCase("SomeUsername_")]
@@ -43,7 +43,7 @@ public class UsernameTests
         var result = Username.Create(username);
 
         Assert.That(result.IsFailure, Is.True);
-        Assert.That(result.Error, Is.EqualTo(UserErrors.UsernameEndsWithUnderscore));
+        Assert.That(result.Error, Is.TypeOf<UserDomainErrors.UsernameEndsWithUnderscore>());
     }
 
     [TestCase("$ome$ymbols#")]
@@ -55,7 +55,7 @@ public class UsernameTests
         var result = Username.Create(username);
 
         Assert.That(result.IsFailure, Is.True);
-        Assert.That(result.Error, Is.EqualTo(UserErrors.UsernameProhibitedSymbols));
+        Assert.That(result.Error, Is.TypeOf<UserDomainErrors.UsernameProhibitedSymbols>());
     }
 
     [TestCase("Username")]

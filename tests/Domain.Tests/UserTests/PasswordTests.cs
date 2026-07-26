@@ -25,7 +25,7 @@ public class PasswordTests
         var result = Password.Create(password, _hasherMock.Object);
 
         Assert.That(result.IsFailure, Is.True);
-        Assert.That(result.Error, Is.EqualTo(UserErrors.PasswordTooShort));
+        Assert.That(result.Error, Is.TypeOf<UserDomainErrors.PasswordTooShort>());
     }
 
     [TestCase("MY1PASSWORD")]
@@ -36,7 +36,7 @@ public class PasswordTests
         var result = Password.Create(password, _hasherMock.Object);
 
         Assert.That(result.IsFailure, Is.True);
-        Assert.That(result.Error, Is.EqualTo(UserErrors.PasswordHasNoLowercase));
+        Assert.That(result.Error, Is.TypeOf<UserDomainErrors.PasswordHasNoLowercase>());
     }
 
     [TestCase("my1password")]
@@ -47,7 +47,7 @@ public class PasswordTests
         var result = Password.Create(password, _hasherMock.Object);
 
         Assert.That(result.IsFailure, Is.True);
-        Assert.That(result.Error, Is.EqualTo(UserErrors.PasswordHasNoUppercase));
+        Assert.That(result.Error, Is.TypeOf<UserDomainErrors.PasswordHasNoUppercase>());
     }
 
     [TestCase("My_Password")]
@@ -57,7 +57,7 @@ public class PasswordTests
         var result = Password.Create(password, _hasherMock.Object);
 
         Assert.That(result.IsFailure, Is.True);
-        Assert.That(result.Error, Is.EqualTo(UserErrors.PasswordHasNoDigit));
+        Assert.That(result.Error, Is.TypeOf<UserDomainErrors.PasswordHasNoDigit>());
     }
 
     [TestCase("My_Password_123")]
