@@ -19,7 +19,7 @@ public sealed partial record Email
     }
 
     private static Error? Validate(string email)
-        => EmailRegex().IsMatch(email) ? null : UserErrors.EmailIsInvalid;
+        => EmailRegex().IsMatch(email) ? null : new UserDomainErrors.EmailIsInvalid();
 
     public static implicit operator string(Email email)
         => email.Value;

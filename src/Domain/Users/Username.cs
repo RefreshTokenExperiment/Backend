@@ -40,11 +40,11 @@ public sealed record Username
 
     private static Error? Validate(string username)
     {
-        if (username.Length > MaxLength) return UserErrors.UsernameIsTooLong;
-        if (char.IsDigit(username[0])) return UserErrors.UsernameStartsWithDigit;
-        if (username.StartsWith('_')) return UserErrors.UsernameStartsWithUnderscore;
-        if (username.EndsWith('_')) return UserErrors.UsernameEndsWithUnderscore;
-        if (username.Any(ch => !AllowedChars.Contains(ch))) return UserErrors.UsernameProhibitedSymbols;
+        if (username.Length > MaxLength) return new UserDomainErrors.UsernameIsTooLong();
+        if (char.IsDigit(username[0])) return new UserDomainErrors.UsernameStartsWithDigit();
+        if (username.StartsWith('_')) return new UserDomainErrors.UsernameStartsWithUnderscore();
+        if (username.EndsWith('_')) return new UserDomainErrors.UsernameEndsWithUnderscore();
+        if (username.Any(ch => !AllowedChars.Contains(ch))) return new UserDomainErrors.UsernameProhibitedSymbols();
 
         return null;
     }
