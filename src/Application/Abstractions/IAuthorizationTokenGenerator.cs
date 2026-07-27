@@ -1,6 +1,6 @@
 using Domain.Users;
 
-namespace Application.Common;
+namespace Application.Abstractions;
 
 public interface IAuthorizationTokenGenerator
 {

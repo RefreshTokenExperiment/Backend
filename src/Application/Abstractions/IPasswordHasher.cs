@@ -1,6 +1,6 @@
 using Domain.Users;
 
-namespace Domain;
+namespace Application.Abstractions;
 
 public interface IPasswordHasher
 {
