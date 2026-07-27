@@ -13,15 +13,9 @@ public sealed record Password
         Value = value;
     }
 
-    public static Result<Password> Create(string password, IPasswordHasher hasher)
-    {
-        var validationError = Validate(password);
-        return validationError is null ? new Password(hasher.Hash(password)) : validationError;
-    }
-
     public static Password FromHash(string passwordHash) => new(passwordHash);
 
-    private static Error? Validate(string password)
+    public static Error? Validate(string password)
     {
         if (password.Length < MinLength) return new UserDomainErrors.PasswordTooShort();
         if (!password.Any(char.IsLower)) return new UserDomainErrors.PasswordHasNoLowercase();
