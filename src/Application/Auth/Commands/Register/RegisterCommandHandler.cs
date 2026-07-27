@@ -1,15 +1,15 @@
 using Shared;
-using Domain;
 using Domain.Users;
 using Domain.RefreshTokens;
-using Application.Common;
 using Microsoft.EntityFrameworkCore;
+using Application.Abstractions;
+using Application.Common;
 
 namespace Application.Auth.Commands.Register;
 
 public sealed class RegisterCommandHandler(
     IDbContext context,
-    IPasswordHasher hasher,
+    PasswordFactory passwordFactory,
     IAuthorizationTokenGenerator tokenGenerator)
 {
     public async Task<Result<AuthResult>> HandleAsync(RegisterCommand command, CancellationToken cancellationToken = default)
@@ -21,10 +21,11 @@ public sealed class RegisterCommandHandler(
         var username = Username.Create(command.Username);
         if (username.IsFailure) return username.Error;
 
-        var password = Password.Create(command.Password, hasher);
-        if (password.IsFailure) return password.Error;
-
         if (string.IsNullOrWhiteSpace(command.DeviceId)) return new AuthErrors.DeviceIdIsNull();
+
+        // var password = Password.Create(command.Password, hasher);
+        var password = passwordFactory.Create(command.Password);
+        if (password.IsFailure) return password.Error;
 
 
         // === Check if there is already a User with such Email or Username ===

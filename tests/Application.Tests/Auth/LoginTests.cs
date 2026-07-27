@@ -1,8 +1,7 @@
 using System.Security.Cryptography;
+using Application.Abstractions;
 using Application.Auth;
 using Application.Auth.Commands.Login;
-using Application.Common;
-using Domain;
 using Domain.RefreshTokens;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;

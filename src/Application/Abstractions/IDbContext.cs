@@ -2,7 +2,7 @@ using Domain.Users;
 using Domain.RefreshTokens;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Common;
+namespace Application.Abstractions;
 
 public interface IDbContext
 {

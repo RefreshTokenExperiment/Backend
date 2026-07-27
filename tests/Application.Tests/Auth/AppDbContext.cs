@@ -1,4 +1,4 @@
-using Application.Common;
+using Application.Abstractions;
 using Domain.RefreshTokens;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
