@@ -1,14 +1,13 @@
-using Domain;
 using Domain.Users;
 using Domain.RefreshTokens;
-using Application.Common;
 using Application.Auth;
 using Application.Auth.Commands.Register;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Testcontainers.PostgreSql;
 using Moq;
+using Application.Abstractions;
+using Application.Common;
 
 namespace Application.Tests.Auth;
 
@@ -33,7 +32,7 @@ public sealed class RegisterTests
 
         _hasherMock = new();
         _tokenGeneratorMock = new();
-        _handler = new(_db, _hasherMock.Object, _tokenGeneratorMock.Object);
+        _handler = new(_db, new PasswordFactory(_hasherMock.Object), _tokenGeneratorMock.Object);
     }
 
     [TearDown]
@@ -86,7 +85,7 @@ public sealed class RegisterTests
         Assert.That(resultEmpty.IsFailure, Is.True);
         Assert.That(resultEmpty.Error, Is.TypeOf<AuthErrors.DeviceIdIsNull>());
         
-        _hasherMock.Verify(x => x.Hash(It.IsAny<string>()), Times.Exactly(2));
+        _hasherMock.Verify(x => x.Hash(It.IsAny<string>()), Times.Never);
         _tokenGeneratorMock.Verify(x => x.GenerateAccess(It.IsAny<User>()), Times.Never);
         _tokenGeneratorMock.Verify(x => x.GenerateRefresh(), Times.Never);
     }

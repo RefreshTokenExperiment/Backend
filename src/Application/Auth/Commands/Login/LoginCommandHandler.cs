@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
-using Application.Common;
-using Domain;
+using Application.Abstractions;
 using Domain.RefreshTokens;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
