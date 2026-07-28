@@ -8,6 +8,6 @@ public sealed class RefreshTokenHasher
     public string Hash(string refreshToken)
     {
         var hashBytes = SHA512.HashData(Encoding.UTF8.GetBytes(refreshToken));
-        return Convert.ToBase64String(hashBytes);
+        return Convert.ToHexStringLower(hashBytes);
     }
 }
