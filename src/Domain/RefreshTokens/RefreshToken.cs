@@ -9,6 +9,7 @@ public sealed class RefreshToken
     public User User { get; set; } = null!;
     public string DeviceId { get; set; } = null!;
     public DateTimeOffset LastTimeUsed { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
     public bool IsRevoked { get; set; }
 
     public void Revoke() => IsRevoked = true;
@@ -21,6 +22,7 @@ public sealed class RefreshToken
         DeviceId = deviceId;
 
         LastTimeUsed = DateTimeOffset.UtcNow;
+        CreatedAt = DateTimeOffset.UtcNow;
     }
     #pragma warning restore IDE0290
 
