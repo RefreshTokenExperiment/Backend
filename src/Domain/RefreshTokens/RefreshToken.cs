@@ -21,8 +21,8 @@ public sealed class RefreshToken
         User = user;
         DeviceId = deviceId;
 
-        LastTimeUsed = DateTimeOffset.UtcNow;
         CreatedAt = DateTimeOffset.UtcNow;
+        LastTimeUsed = CreatedAt;
     }
     #pragma warning restore IDE0290
 

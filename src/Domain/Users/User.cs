@@ -2,10 +2,10 @@ namespace Domain.Users;
 
 public sealed class User
 {
-    public UserId Id { get; init; }
-    public Email Email { get; init; }
-    public Username Username { get; init; }
-    public Password Password { get; init; }
+    public UserId Id { get; set; }
+    public Email Email { get; set; }
+    public Username Username { get; set; }
+    public Password Password { get; set; }
 
     // Sign-Up
     public User(Email email, Username username, Password password)
