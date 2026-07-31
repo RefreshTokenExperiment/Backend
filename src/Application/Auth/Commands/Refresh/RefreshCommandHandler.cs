@@ -4,11 +4,12 @@ using Shared;
 
 namespace Application.Auth.Commands.Refresh;
 
-public sealed class RefreshCommandHandler(IRefreshTokenHasher hasher, IDbContext db, IAuthorizationTokenGenerator tokenGenerator)
+public sealed class RefreshCommandHandler(
+    IRefreshTokenHasher hasher,
+    IDbContext db,
+    IRefreshTokenConfig config,
+    IAuthorizationTokenGenerator tokenGenerator)
 {
-    public static readonly TimeSpan MaxLifecycle = TimeSpan.FromDays(180);
-    public static readonly TimeSpan MaxInactivity = TimeSpan.FromDays(3);
-
     public async Task<Result<RefreshCommandResult>> HandleAsync(RefreshCommand command, CancellationToken cancellationToken = default)
     {
         // Search Token In Database
@@ -21,8 +22,8 @@ public sealed class RefreshCommandHandler(IRefreshTokenHasher hasher, IDbContext
         if (foundToken is null) return new AuthErrors.InvalidCredentials();
 
         // Check if it is ended lifecycle or it's last activity is too far, if true - revoke it
-        var isLifecycleEnded = DateTimeOffset.UtcNow - foundToken.CreatedAt > MaxLifecycle;
-        var isTokenInactivated = DateTimeOffset.UtcNow - foundToken.LastTimeUsed > MaxInactivity;
+        var isLifecycleEnded = DateTimeOffset.UtcNow - foundToken.CreatedAt > config.MaxLifetime;
+        var isTokenInactivated = DateTimeOffset.UtcNow - foundToken.LastTimeUsed > config.MaxInactivity;
 
         if (isLifecycleEnded || isTokenInactivated)
         {
