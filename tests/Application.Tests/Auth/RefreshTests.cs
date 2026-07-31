@@ -17,6 +17,7 @@ public sealed class RefreshTests
     private RefreshCommandHandler _handler = null!;
     private AppDbContext _db = null!;
     private Mock<IRefreshTokenHasher> _hasherMock = null!;
+    private Mock<IRefreshTokenConfig> _configMock = null!;
     private Mock<IAuthorizationTokenGenerator> _generatorMock = null!;
 
     private IDbContextTransaction _transaction = null!;
@@ -26,8 +27,9 @@ public sealed class RefreshTests
     {
         _db = new(TestContainerFixture.Options);
         _hasherMock = new();
+        _configMock = new();
         _generatorMock = new();
-        _handler = new(_hasherMock.Object, _db, _generatorMock.Object);
+        _handler = new(_hasherMock.Object, _db, _configMock.Object, _generatorMock.Object);
 
         _transaction = await _db.Database.BeginTransactionAsync();
     }
@@ -142,20 +144,21 @@ public sealed class RefreshTests
 
         var command = new RefreshCommand(refreshToken, deviceId);
 
+        var maxLifetime = TimeSpan.Zero;
+        var maxInactivity = TimeSpan.MaxValue;
 
         var newUser = new User(
             Email.Create("somevalid@mail.com").Value!,
             Username.Create("SomeValid").Value!,
             Password.FromHash("S0m3H@5H3DP@55w0rD"));
-        var newRefresh = new RefreshToken(refreshTokenHash, newUser, deviceId)
-        {
-            CreatedAt = DateTimeOffset.UtcNow.Subtract(RefreshCommandHandler.MaxLifecycle)
-        };
+        var newRefresh = new RefreshToken(refreshTokenHash, newUser, deviceId);
 
         await _db.Set<RefreshToken>().AddAsync(newRefresh, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
         
         _hasherMock.Setup(x => x.Hash(refreshToken)).Returns(refreshTokenHash);
+        _configMock.SetupGet(x => x.MaxLifetime).Returns(maxLifetime);
+        _configMock.SetupGet(x => x.MaxInactivity).Returns(maxInactivity);
 
         // Act
         await Task.Delay(1000);
@@ -168,6 +171,8 @@ public sealed class RefreshTests
         Assert.That(foundToken.IsRevoked, Is.True);
 
         _hasherMock.Verify(x => x.Hash(refreshToken), Times.Once);
+        _configMock.Verify(x => x.MaxLifetime, Times.Once);
+        _configMock.Verify(x => x.MaxInactivity, Times.Once);
     }
 
     [Test]
@@ -181,20 +186,22 @@ public sealed class RefreshTests
 
         var command = new RefreshCommand(refreshToken, deviceId);
 
+        var maxLifetime = TimeSpan.MaxValue;
+        var maxInactivity = TimeSpan.Zero;
+
 
         var newUser = new User(
             Email.Create("somevalid@mail.com").Value!,
             Username.Create("SomeValid").Value!,
             Password.FromHash("S0m3H@5H3DP@55w0rD"));
-        var newRefresh = new RefreshToken(refreshTokenHash, newUser, deviceId)
-        {
-            LastTimeUsed = DateTimeOffset.UtcNow.Subtract(RefreshCommandHandler.MaxInactivity)
-        };
+        var newRefresh = new RefreshToken(refreshTokenHash, newUser, deviceId);
 
         await _db.Set<RefreshToken>().AddAsync(newRefresh, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
         
         _hasherMock.Setup(x => x.Hash(refreshToken)).Returns(refreshTokenHash);
+        _configMock.SetupGet(x => x.MaxLifetime).Returns(maxLifetime);
+        _configMock.SetupGet(x => x.MaxInactivity).Returns(maxInactivity);
 
         // Act
         await Task.Delay(1000);
@@ -207,6 +214,8 @@ public sealed class RefreshTests
         Assert.That(foundToken.IsRevoked, Is.True);
 
         _hasherMock.Verify(x => x.Hash(refreshToken), Times.Once);
+        _configMock.Verify(x => x.MaxLifetime, Times.Once);
+        _configMock.Verify(x => x.MaxInactivity, Times.Once);
     }
 
     [Test]
@@ -221,18 +230,22 @@ public sealed class RefreshTests
 
         var command = new RefreshCommand(refreshToken, deviceId);
 
+        var maxLifetime = TimeSpan.MaxValue;
+        var maxInactivity = TimeSpan.MaxValue;
 
         var newUser = new User(
             Email.Create("somevalid@mail.com").Value!,
             Username.Create("SomeValid").Value!,
             Password.FromHash("S0m3H@5H3DP@55w0rD"));
-        var newRefresh = new RefreshToken(refreshTokenHash, newUser, deviceId) { LastTimeUsed = DateTimeOffset.UtcNow.Subtract(RefreshCommandHandler.MaxInactivity - TimeSpan.FromHours(1)) };
+        var newRefresh = new RefreshToken(refreshTokenHash, newUser, deviceId);
 
         await _db.Set<RefreshToken>().AddAsync(newRefresh, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
         
         _hasherMock.Setup(x => x.Hash(refreshToken)).Returns(refreshTokenHash);
         _generatorMock.Setup(x => x.GenerateAccess(It.IsAny<User>())).Returns(accessToken);
+        _configMock.SetupGet(x => x.MaxLifetime).Returns(maxLifetime);
+        _configMock.SetupGet(x => x.MaxInactivity).Returns(maxInactivity);
 
         // Act
         var result = await _handler.HandleAsync(command, cancellationToken);
@@ -247,5 +260,7 @@ public sealed class RefreshTests
 
         _hasherMock.Verify(x => x.Hash(refreshToken), Times.Once);
         _generatorMock.Verify(x => x.GenerateAccess(It.IsAny<User>()), Times.Once);
+        _configMock.Verify(x => x.MaxLifetime, Times.Once);
+        _configMock.Verify(x => x.MaxInactivity, Times.Once);
     }
 }
