@@ -21,11 +21,11 @@ public sealed class RefreshCommandHandler(
             && x.IsRevoked == false, cancellationToken);
         if (foundToken is null) return new AuthErrors.InvalidCredentials();
 
-        // Check if it is ended lifecycle or it's last activity is too far, if true - revoke it
-        var isLifecycleEnded = DateTimeOffset.UtcNow - foundToken.CreatedAt > config.MaxLifetime;
+        // Check if it's lifetime is ended or it's last activity is too far, if true - revoke it
+        var isLifetimeEnded = DateTimeOffset.UtcNow - foundToken.CreatedAt > config.MaxLifetime;
         var isTokenInactivated = DateTimeOffset.UtcNow - foundToken.LastTimeUsed > config.MaxInactivity;
 
-        if (isLifecycleEnded || isTokenInactivated)
+        if (isLifetimeEnded || isTokenInactivated)
         {
             foundToken.Revoke();
             await db.SaveChangesAsync(cancellationToken);
