@@ -22,6 +22,11 @@ public sealed class RefreshTokenConfiguration : IEntityTypeConfiguration<Refresh
             .IsRequired();
 
         builder
+            .Property(x => x.CreatedAt)
+            .HasColumnName("CreatedAt")
+            .IsRequired();
+
+        builder
             .Property(x => x.LastTimeUsed)
             .HasColumnName("LastTimeUsed")
             .IsRequired();
