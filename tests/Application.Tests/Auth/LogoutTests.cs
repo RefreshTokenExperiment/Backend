@@ -62,7 +62,7 @@ public sealed class LogoutTests
         Assert.That(result.Error, Is.TypeOf<AuthErrors.InvalidCredentials>());
 
         _hasherMock.Verify(x => x.Hash(refreshToken), Times.Never);
-        _tokenBlacklistMock.Verify(x => x.Block(accessToken), Times.Never);
+        _tokenBlacklistMock.Verify(x => x.BlockAsync(accessToken), Times.Never);
     }
 
     [Test]
@@ -83,7 +83,7 @@ public sealed class LogoutTests
         Assert.That(result.IsFailure, Is.False);
 
         _hasherMock.Verify(x => x.Hash(refreshToken), Times.Once);
-        _tokenBlacklistMock.Verify(x => x.Block(accessToken), Times.Once);
+        _tokenBlacklistMock.Verify(x => x.BlockAsync(accessToken), Times.Once);
     }
 
     [Test]
@@ -117,7 +117,7 @@ public sealed class LogoutTests
         Assert.That(result.IsFailure, Is.False);
 
         _hasherMock.Verify(x => x.Hash(refreshToken), Times.Once);
-        _tokenBlacklistMock.Verify(x => x.Block(accessToken), Times.Once);
+        _tokenBlacklistMock.Verify(x => x.BlockAsync(accessToken), Times.Once);
     }
 
     [Test]
@@ -158,6 +158,6 @@ public sealed class LogoutTests
         Assert.That(foundToken.IsRevoked, Is.True);
 
         _hasherMock.Verify(x => x.Hash(refreshToken), Times.Once);
-        _tokenBlacklistMock.Verify(x => x.Block(accessToken), Times.Once);
+        _tokenBlacklistMock.Verify(x => x.BlockAsync(accessToken), Times.Once);
     }
 }

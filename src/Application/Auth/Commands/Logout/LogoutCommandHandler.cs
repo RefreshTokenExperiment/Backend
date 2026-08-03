@@ -22,7 +22,7 @@ public sealed class LogoutCommandHandler(IRefreshTokenHasher hasher, IDbContext 
         await db.SaveChangesAsync(cancellationToken);
 
         // Blacklist Access Token.
-        await tokenBlacklist.Block(command.AccessToken);
+        await tokenBlacklist.BlockAsync(command.AccessToken, cancellationToken);
         return Result.Success();
     }
 }
