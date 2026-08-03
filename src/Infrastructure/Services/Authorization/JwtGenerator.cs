@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Services.Authorization;
 
-public sealed class JwtGenerator(JwtConfig config, RefreshTokenHasher hasher) : IAuthorizationTokenGenerator
+public sealed class JwtGenerator(IJwtConfig config, RefreshTokenHasher hasher) : IAuthorizationTokenGenerator
 {
     public string GenerateAccess(User user)
     {

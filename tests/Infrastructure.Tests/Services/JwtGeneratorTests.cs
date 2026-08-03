@@ -3,6 +3,7 @@ using Domain.Users;
 using Infrastructure.Services.Authorization;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Moq;
 
 namespace Infrastructure.Tests.Services;
 
@@ -10,21 +11,20 @@ namespace Infrastructure.Tests.Services;
 public sealed class JwtGeneratorTests
 {
     private JwtGenerator _jwtGenerator = null!;
-    private JwtConfig _config = null!;
+    private Mock<IJwtConfig> _configMock = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _config = new JwtConfig
-        {
-            Audience = "audience",
-            Issuer = "issuer",
-            Expiration = TimeSpan.Parse("00:10:00"),
-            Secret = RandomNumberGenerator.GetHexString(384 / 8), // HMAC384 Min Length
-            SecurityAlgorithm = SecurityAlgorithms.HmacSha384
-        };
+        _configMock = new();
+        _configMock.SetupGet(x => x.Audience).Returns("===Audience===");
+        _configMock.SetupGet(x => x.Issuer).Returns("===Issuer===");
+        _configMock.SetupGet(x => x.Expiration).Returns(TimeSpan.FromMinutes(10));
+        _configMock.SetupGet(x => x.Secret).Returns("===*** Some Really Interesting and Long Secret Code ***===");
+        _configMock.SetupGet(x => x.SecurityAlgorithm).Returns(SecurityAlgorithms.HmacSha384);
+        _configMock.SetupGet(x => x.SymmetricSecurityKey).CallBase();
 
-        _jwtGenerator = new(_config, new RefreshTokenHasher());
+        _jwtGenerator = new(_configMock.Object, new RefreshTokenHasher());
     }
 
     [Test]
@@ -42,12 +42,14 @@ public sealed class JwtGeneratorTests
             ValidateIssuer = true,
             ValidateLifetime = true,
 
-            ValidAudience = _config.Audience,
-            ValidIssuer = _config.Issuer,
+            ValidAudience = _configMock.Object.Audience,
+            ValidIssuer = _configMock.Object.Issuer,
             ClockSkew = TimeSpan.Zero,
 
-            IssuerSigningKey = _config.SymmetricSecurityKey
+            IssuerSigningKey = _configMock.Object.SymmetricSecurityKey
         };
+
+
 
         // Act
         var token = _jwtGenerator.GenerateAccess(user);
@@ -62,6 +64,6 @@ public sealed class JwtGeneratorTests
         Assert.That(parsedToken.IsValid, Is.True);
         Assert.That(sub, Is.EqualTo(user.Id.Value.ToString()));
         Assert.That(nickname, Is.EqualTo(user.Username.Value));
-        Assert.That(expiresAt.UtcDateTime, Is.EqualTo(currentTime.Add(_config.Expiration)).Within(TimeSpan.FromSeconds(2)));
+        Assert.That(expiresAt.UtcDateTime, Is.EqualTo(currentTime.Add(_configMock.Object.Expiration)).Within(TimeSpan.FromSeconds(2)));
     }
 }
