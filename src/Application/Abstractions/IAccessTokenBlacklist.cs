@@ -2,6 +2,6 @@ namespace Application.Abstractions;
 
 public interface IAccessTokenBlacklist
 {
-    public Task<bool> Exists(string accessToken);
-    public Task Block(string accessToken);
+    public Task<bool> ExistsAsync(string accessToken, CancellationToken cancellationToken = default);
+    public Task BlockAsync(string accessToken, CancellationToken cancellationToken = default);
 }
