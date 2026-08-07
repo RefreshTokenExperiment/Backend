@@ -10,7 +10,7 @@ public sealed class LogoutCommandHandler(IRefreshTokenHasher hasher, IDbContext 
     public async Task<Result> HandleAsync(LogoutCommand command, CancellationToken cancellationToken = default)
     {
         // Validate UserId
-        if (!Guid.TryParse(command.UserId, out var userId)) return new AuthErrors.InvalidCredentials();
+        if (!Guid.TryParse(command.UserId, out var userId) || command.RefreshToken is null) return new AuthErrors.InvalidCredentials();
 
         // Find Refresh Token and Revoke it.
         var hash = hasher.Hash(command.RefreshToken);
