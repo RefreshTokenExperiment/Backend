@@ -13,6 +13,7 @@ public sealed class RefreshCommandHandler(
     public async Task<Result<RefreshCommandResult>> HandleAsync(RefreshCommand command, CancellationToken cancellationToken = default)
     {
         // Search Token In Database
+        if (command.RefreshToken is null) return new AuthErrors.InvalidCredentials();
         var hash = hasher.Hash(command.RefreshToken);
 
         var foundToken = await db.RefreshTokens.Include(x => x.User).SingleOrDefaultAsync(x => 
